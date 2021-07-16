@@ -1,4 +1,4 @@
-
+library(parallel)
 #' read the entire pedigree file in
 #'
 read_ped <- function(P) {
@@ -65,10 +65,10 @@ one_rep_pw <- function(ped, rep, max_idx) {
 pw_posteriors <-  function(path, sweeps = 6:25, max_idx = 6604) {
   ped <- read_ped(path)
 
-  big_tib <- lapply(sweeps, function(s) one_rep_pw(ped, s, max_idx)) %>%
+  big_tib <- mclapply(sweeps, FUN =  function(s) one_rep_pw(ped, s, max_idx), mc.cores = 8) %>%
     bind_rows()
 
-  num_reps <- length(sweeps)
+  # num_reps <- length(sweeps)
 
   ret <- big_tib %>%
     group_by(id_1, id_2, dom_relat, max_hit) %>%
